@@ -1,0 +1,62 @@
+<template>
+    <div id="page-wrapper">
+        <h3>商品分类管理</h3>
+        <table class="table table-hover table-bordered table-responsive">
+            <thead>
+                <tr>
+                    <th>分类名称</th>
+                    <th>图标路径</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="category in categories">
+                    <td>{{category.Name}}</td>
+                    <td>{{category.IconPath}}</td>
+                    <td>
+                        <i class="glyphicon glyphicon-edit operator" role="button" @click="onEdit(category)"></i>
+                        <i class="glyphicon glyphicon-remove" role="button" @click="onRemove(category)"></i>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <form class="form-inline bottom">
+            <div class="form-group">
+                <label for="cateName">名称</label>
+                <input class="form-control" id="cateName" name="cateName" v-model="currCategory.Name" type="text">
+            </div>
+            <!--<div class="form-group">
+                                <label for="upload">选择图标</label>
+                                <input type="file" ng2FileSelect [uploader]="uploader" (change)="selectFileOnChanged($event)">
+                            </div>-->
+            <div class="form-group">
+                <div v-if="currCategory.IconPath">
+                    <img :src="currCategory.IconPath" alt="" class="uploadPic">
+                    <button class="btn btn-danger btn-xs" @click="onPicRemove()">删除</button>
+                </div>
+                <!--<div v-for="item in uploader.queue">
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" v-if="item" [ngStyle]="{'width':item.progress+'%'}"></div>
+                                    </div>
+                                    <button class="btn btn-xs btn-primary" @click="item.upload()" [disabled]="item.isReady || item.isUploading || item.isSuccess">
+                                        <i class="glyphicon glyphicon-upload"></i>上传</button>
+                                    <button class="btn btn-xs btn-danger" @click="item.remove()">
+                                        <i class="glyphicon glyphicon-trash"></i>删除</button>
+                                </div>-->
+            </div>
+            <button class="btn btn-primary" @click="onSubmit()" v-if="!currCategory.Id">添加</button>
+            <button class="btn btn-primary" @click="onUpdate()" v-if="currCategory.Id">更新</button>
+        </form>
+    </div>
+</template>
+<script>
+export default {
+    data() {
+        return {
+            categories: [],
+            currCategory: {}
+        }
+    }
+}
+</script>
+
