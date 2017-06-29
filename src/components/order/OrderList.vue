@@ -71,19 +71,22 @@
             </div>
         </div>
         <ul class="pagination pagerbottom" v-if="pages.length>0">
-            <li [class.disabled]="index<=1">
+            <li :class="{disabled:index<=1}">
                 <a @click="onPrev()">&laquo;</a>
             </li>
             <li v-for="page in pages" :class="{active:page==index}">
                 <a @click="onPageClick(page)">{{page}}</a>
             </li>
-            <li [class.disabled]="index*20>=count">
+            <li :class="{disabled:index*20>=count}">
                 <a @click="onNext()">&raquo;</a>
             </li>
         </ul>
     </div>
 </template>
 <script>
+import { baseUrl } from '../shared/settings.js'
+import axios from 'axios'
+var utils = require('../shared/utils.js')
 export default {
     data() {
         return {
@@ -96,16 +99,112 @@ export default {
             currOrder: {}
         }
     },
+    created() {
+        this.doLoading()
+    },
     methods: {
-        onSearch() { },
-        onSend(order) { },
-        onCancelOrder(order) { },
-        onComplete(order) { },
-        onRemoveOrder(order) { },
-        onSubmitCancel() { },
-        onPrev() { },
-        onNext() { },
-        onPageClick(page) { }
+        onSearch() {
+            this.index = 1;
+            this.doLoading()
+        },
+        onSend(order) {
+            axios.put(baseUrl + 'orders/' + order.Id, { State: 1 }).then(res => {
+                if (res.data.state == 1) {
+                    order.State = 1;
+                } else {
+                    alert(res.data.message)
+                }
+            })
+        },
+        onCancelOrder(order) {
+            this.currOrder = order
+        },
+        onComplete(order) {
+            let finishTime = new Date();
+            axios.put(baseUrl + 'orders/' + order.Id, { State: 3, FinishTime: finishTime })
+                .then(res => {
+                    if (res.data.state == 1) {
+                        order.State = 3
+                        order.FinishTime = finishTime
+                    } else {
+                        alert(res.data.message)
+                    }
+                })
+        },
+        onRemoveOrder(order) {
+            if (confirm('确认删除该订单吗？')) {
+                axios.delete(baseUrl + 'orders/' + oreder.Id)
+                    .then(res => {
+                        if (res.data.state == 1) {
+                            this.orders.splice(order, 1)
+                        } else {
+                            alert(res.data.message)
+                        }
+                    })
+            }
+        },
+        onSubmitCancel() {
+            let cancelTime = new Date();
+            axios.put(baseUrl + 'orders/' + order.Id, { State: 2, CancelReason: this.reason, CancelTime: cancelTime })
+                .then(res => {
+                    if (res.data.state == 1) {
+                        order.State = 2
+                        order.CancelReason = this.reason
+                        order.CancelTime = cancelTime
+                    } else {
+                        alert(res.data.message)
+                    }
+                })
+        },
+        onPrev() {
+            if (this.index <= 1)
+                return
+            this.index--
+            this.doLoading()
+        },
+        onNext() {
+            if ((this.index * 10) >= this.count) {
+                return
+            }
+            this.index++
+            this.doLoading()
+        },
+        onPageClick(page) {
+            this.index = page
+            this.doLoading()
+        },
+        doLoading() {
+            let url = baseUrl + 'orders'
+            var params = { index: this.index, perPage: 10 }
+            if (this.condition.keyword) {
+                params.keyword = condition.keyword
+            }
+            if (this.condition.begin) {
+                params.begin = condition.begin
+            }
+            if (this.condition.end) {
+                params.end = condition.end
+            }
+            params.noshowRemove = true;
+
+            axios.get(url, { params: params })
+                .then(res => {
+                    if (res.data.state == 1) {
+                        this.count = res.data.body.count
+                        this.orders = res.data.body.items
+                        this.orders.forEach(order => {
+                            let total = order.Products.map(p => utils.mutiple(p.Price, p.Count)).reduce((x, y) => utils.add(x, y));
+                            order.total = utils.add(total, order.DeliveryCharge);
+                            order.Products.forEach(p => {
+                                p.cost = utils.mutiple(p.Count, p.Price);
+                            });
+
+                        })
+                        let pager = utils.getPager(this.count, this.index, 10)
+                        this.pages = pager.pages
+                    }
+                })
+        }
     }
 }
 </script>

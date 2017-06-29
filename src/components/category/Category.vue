@@ -52,7 +52,7 @@
 </template>
 <script>
 import VueFileUpload from 'vue-file-upload'
-import { baseUrl } from '../shared/settings'
+// import { baseUrl } from '../shared/settings'
 export default {
     components: {
         VueFileUpload
