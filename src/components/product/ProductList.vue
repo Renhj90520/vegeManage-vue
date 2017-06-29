@@ -55,14 +55,14 @@
                     <div class="form-group">
                         <label for="unit">单位</label>
                         <select class="form-control" id="unit" name="unit" required @change="onUnitChange($event)" v-model="currProduct.UnitId">
-                            <option [value]="unit.Id" v-for="unit in units">{{unit.Name}}</option>
+                            <option value="unit.Id" v-for="unit in units">{{unit.Name}}</option>
                         </select>
                         <!--<p class="error" v-if="prodUnit.touched&&!prodUnit.valid">请选择商品单位！</p>-->
                     </div>
                     <div class="form-group">
                         <label for="category">分类</label>
                         <select class="form-control" id="category" name="category" required @change="onCateChange($event)" v-model="currProduct.CategoryId">
-                            <option [value]="category.Id" v-for="category in categories">{{category.Name}}</option>
+                            <option value="category.Id" v-for="category in categories">{{category.Name}}</option>
                         </select>
                         <!--<p class="error" v-if="prodCate.touched&&!prodCate.valid">请选择商品分类！</p>-->
                     </div>
