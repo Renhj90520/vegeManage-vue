@@ -5,6 +5,7 @@ import App from "./App";
 import router from "./router";
 import "./assets/css/bootstrap.min.css";
 import "./assets/js/bootstrap";
+import VeeValidate from "vee-validate";
 
 Vue.config.productionTip = false;
 Vue.filter("mydate", value => {
@@ -22,6 +23,7 @@ Vue.filter("orderstate", value => {
       return "交易完成";
   }
 });
+Vue.use(VeeValidate);
 /* eslint-disable no-new */
 new Vue({
   el: "#app",

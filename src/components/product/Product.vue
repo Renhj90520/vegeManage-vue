@@ -5,47 +5,47 @@
                 <div class="form-group">
                     <div class="col-sm-8 nopadding">
                         <label for="prodName">名称</label>
-                        <input class="form-control" id="prodName" name="prodName" type="text" required v-model="newProduct.Name">
-                        <!--<p class="error" v-if="name.touched&&!name.valid">请输入商品名称！</p>-->
+                        <input v-validate.initial="'required'" class="form-control" id="prodName" name="prodName" type="text" v-model="newProduct.Name">
+                        <p class="error" v-show="fields.prodName&&fields.prodName.touched&&errors.has('prodName')">请输入商品名称！</p>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-8 nopadding">
                         <label for="count">数量</label>
-                        <input class="form-control" id="count" name="count" type="number" required v-model="newProduct.TotalCount">
-                        <!--<p class="error" v-if="prodCount.touched&&!prodCount.valid">请输入数量！</p>-->
+                        <input v-validate.initial="'required'" class="form-control" id="count" name="count" type="number" v-model="newProduct.TotalCount">
+                        <p class="error" v-show="fields.count&&fields.count.touched&&errors.has('count')">请输入数量！</p>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-8 nopadding">
                         <label for="unit">单位</label>
-                        <select class="form-control" id="unit" name="unit" required @change="onUnitChange" v-model="newProduct.UnitId">
+                        <select v-validate="'required'" class="form-control" id="unit" name="unit" @change="onUnitChange" v-model="newProduct.UnitId">
                             <option :value="unit.Id" v-for="unit in units">{{unit.Name}}</option>
                         </select>
-                        <!--<p class="error" v-if="prodUnit.touched&&!prodUnit.valid">请选择商品单位！</p>-->
+                        <p class="error" v-show="fields.unit&&fields.unit.touched&&errors.has('unit')">请选择商品单位！</p>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-8 nopadding">
                         <label for="category">分类</label>
-                        <select class="form-control" id="category" name="category" required v-model="newProduct.CategoryId">
+                        <select v-validate="'required'" class="form-control" id="category" name="category" v-model="newProduct.CategoryId">
                             <option :value="category.Id" v-for="category in categories">{{category.Name}}</option>
                         </select>
-                        <!--<p class="error" v-if="prodCate.touched&&!prodCate.valid">请选择商品分类！</p>-->
+                        <p class="error" v-show="fields.category&&fields.category.touched&&errors.has('category')">请选择商品分类！</p>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-8 nopadding">
                         <label for="price">价格</label>
-                        <input class="form-control" id="price" name="price" type="number" required v-model="newProduct.Price">
-                        <!--<p class="error" v-if="prodPrice.touched&&!prodPrice.valid">请输入价格！</p>-->
+                        <input v-validate="'required'" class="form-control" id="price" name="price" type="number" v-model="newProduct.Price">
+                        <p class="error" v-show="fields.price&&fields.price.touched&&errors.has('price')">请输入价格！</p>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-8 nopadding">
                         <label for="description">描述</label>
-                        <input class="form-control" id="description" name="description" type="textarea" required rows="3" v-model="newProduct.Description">
-                        <!--<p class="error" v-if="prodDesc.touched&&!prodDesc.valid">请输入描述！</p>-->
+                        <input v-validate="'required'" class="form-control" id="description" name="description" type="textarea" rows="3" v-model="newProduct.Description">
+                        <p class="error" v-show="fields.description&&fields.description.touched&&errors.has('description')">请输入描述！</p>
                     </div>
                 </div>
                 <div class="form-group">

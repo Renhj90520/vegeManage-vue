@@ -10,19 +10,19 @@
                         <form>
                             <fieldset>
                                 <div class="form-group">
-                                    <input class="form-control" id="uname" name="uname" type="text" v-model="userName" required placeholder="用户名">
-                                    <!--<p class="error" *ngIf="usernameInp.touched && !usernameInp.valid">用户名不能空</p>-->
+                                    <input v-validate.initial="'required'" class="form-control" id="uname" name="uname" type="text" v-model="userName" placeholder="用户名">
+                                    <p class="error" v-show="fields.uname&&fields.uname.touched && errors.has('uname')">用户名不能空</p>
                                 </div>
                                 <div class="form-group">
-                                    <input class="form-control" id="pwd" name="pwd" type="password" v-model="password" required placeholder="密码">
-                                    <!--<p class="error" *ngIf="passwordInp.touched && !passwordInp.valid">密码不能空</p>-->
+                                    <input v-validate.initial="'required'" class="form-control" id="pwd" name="pwd" type="password" v-model="password" required placeholder="密码">
+                                    <p class="error" v-show="fields.pwd&&fields.pwd.touched&&errors.has('pwd')">密码不能空</p>
                                 </div>
                                 <div class="checkbox">
                                     <label>
                                         <input name="remember" type="checkbox" value="remember" v-model="rememberPwd">记住密码
                                     </label>
                                 </div>
-                                <button class="btn btn-lg btn-success btn-block" @click.prevent="onLogin">登录</button>
+                                <button class="btn btn-lg btn-success btn-block" :disabled="errors.any()" @click.prevent="onLogin">登录</button>
                             </fieldset>
                         </form>
                     </div>
