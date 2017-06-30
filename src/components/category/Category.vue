@@ -45,14 +45,15 @@
                         <i class="glyphicon glyphicon-trash"></i>删除</button>
                 </div>
             </div>
-            <button class="btn btn-primary" @click="onSubmit()" v-if="!currCategory.Id">添加</button>
-            <button class="btn btn-primary" @click="onUpdate()" v-if="currCategory.Id">更新</button>
+            <button class="btn btn-primary" @click.prevent="onSubmit()" v-if="!currCategory.Id">添加</button>
+            <button class="btn btn-primary" @click.prevent="onUpdate()" v-if="currCategory.Id">更新</button>
         </form>
     </div>
 </template>
 <script>
 import VueFileUpload from 'vue-file-upload'
-// import { baseUrl } from '../shared/settings'
+import { baseUrl } from '../shared/settings'
+import axios from 'axios'
 export default {
     components: {
         VueFileUpload
@@ -89,7 +90,60 @@ export default {
             }
         }
     },
+    created() {
+        axios.get(baseUrl + 'categories')
+            .then(res => {
+                if (res.data.state == 1) {
+                    this.categories = res.data.body
+                } else {
+                    alert(res.data.message)
+                }
+            })
+    },
     methods: {
+        onEdit(cate) {
+            if (this.currCategory && this.currCategory.IconPath && !this.currCategory.Id) {
+                axios.delete(baseUrl + 'categories/0/' + this.currCategory.IconPath)
+            }
+            this.currCategory = cate;
+            if (this.files.length > 0) {
+                this.files.length = 0
+            }
+        },
+        onRemove(cate) {
+            if (confirm('确定要删除该商品分类吗？')) {
+                axios.delete(baseUrl + 'categories/' + cate.Id)
+                    .then(res => {
+                        if (res.data.state == 1) {
+                            this.categories.splice(this.categories.indexOf(cate), 1)
+                        } else {
+                            alert(res.data.message)
+                        }
+                    })
+            }
+        },
+        onUpdate() {
+            axios.put(baseUrl + 'categories/', this.currCategory)
+                .then(res => {
+                    if (res.data.state == 1) {
+                        this.currCategory = {}
+                        alert('修改成功')
+                    } else {
+                        alert(res.data.message)
+                    }
+                })
+        },
+        onSubmit() {
+            axios.post(baseUrl + 'categories', this.currCategory)
+                .then(res => {
+                    if (res.data.state == 1) {
+                        this.categories.push(res.data.body)
+                        this.currCategory = {}
+                    } else {
+                        alert(res.data.message)
+                    }
+                })
+        },
         onStatus(file) {
             if (file.isSuccess) {
                 return "上传成功";

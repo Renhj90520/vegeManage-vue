@@ -19,8 +19,8 @@
                 <div class="form-group">
                     <div class="col-sm-8 nopadding">
                         <label for="unit">单位</label>
-                        <select class="form-control" id="unit" name="unit" required @change="onUnitChange($event)" v-model="newProduct.UnitId">
-                            <option v-model="unit.Id" v-for="unit in units">{{unit.Name}}</option>
+                        <select class="form-control" id="unit" name="unit" required @change="onUnitChange" v-model="newProduct.UnitId">
+                            <option :value="unit.Id" v-for="unit in units">{{unit.Name}}</option>
                         </select>
                         <!--<p class="error" v-if="prodUnit.touched&&!prodUnit.valid">请选择商品单位！</p>-->
                     </div>
@@ -28,8 +28,8 @@
                 <div class="form-group">
                     <div class="col-sm-8 nopadding">
                         <label for="category">分类</label>
-                        <select class="form-control" id="category" name="category" required @change="onCateChange($event)" v-model="newProduct.CategoryId">
-                            <option v-model="category.Id" v-for="category in categories">{{category.Name}}</option>
+                        <select class="form-control" id="category" name="category" required v-model="newProduct.CategoryId">
+                            <option :value="category.Id" v-for="category in categories">{{category.Name}}</option>
                         </select>
                         <!--<p class="error" v-if="prodCate.touched&&!prodCate.valid">请选择商品分类！</p>-->
                     </div>
@@ -77,6 +77,7 @@
 <script>
 import VueFileUpload from 'vue-file-upload'
 import { baseUrl } from '../shared/settings.js'
+import axios from 'axios'
 export default {
     components: {
         VueFileUpload
@@ -117,10 +118,92 @@ export default {
             }
         }
     },
+    created() {
+        let id = this.$route.params.id;
+
+        axios.get(baseUrl + 'units')
+            .then(res => {
+                if (res.data.state == 1) {
+                    this.units = res.data.body
+                    if (this.units && this.units.length > 0) {
+                        let unit = this.units[0];
+                        if (!id) {
+                            this.newProduct.UnitId = unit.Id;
+                            this.newProduct.UnitName = unit.Name;
+                            this.newProduct.Step = unit.Step;
+                        }
+                    }
+                } else {
+                    alert(res.data.message)
+                }
+            })
+        axios.get(baseUrl + 'categories')
+            .then(res => {
+                if (res.data.state == 1) {
+                    this.categories = res.data.body
+                    if (this.categories && this.categories.length > 0) {
+                        if (!id) {
+                            this.newProduct.CategoryId = this.categories[0].Id;
+                        }
+                    }
+                } else {
+                    alert(res.data.message)
+                }
+            })
+        if (id) {
+            axios.get(baseUrl + 'products/' + id)
+                .then(res => {
+                    if (res.data.state == 1) {
+                        this.newProduct = res.data.body.items[0]
+                    } else {
+                        alert(res.data.message)
+                    }
+                })
+        }
+    },
     methods: {
-        onUnitChange(unit) { },
-        onCateChange(cate) { },
-        onSubmit() { }, onStatus(file) {
+        onUnitChange() {
+            let id = this.newProduct.UnitId;
+            let unit = this.units.find(u => { return u.Id == id })
+            this.newProduct.UnitName = unit.Name
+            this.newProduct.Step = unit.Step
+        },
+        onSubmit() {
+            if (this.newProduct.Id) {
+                axios.put(baseUrl + 'products/' + this.newProduct.Id, this.newProduct)
+                    .then(res => {
+                        if (res.data.state == 1) {
+                            alert('修改成功')
+                            this.newProduct = {}
+                        } else {
+                            alert(res.data.message)
+                        }
+                    })
+            } else {
+                axios.post(baseUrl + 'products', this.newProduct)
+                    .then(res => {
+                        if (res.data.state == 1) {
+                            alert('添加成功')
+                            this.newProduct = {}
+                        } else {
+                            alert(res.data.message)
+                        }
+                    })
+            }
+        },
+        onPicRemove(i) {
+            this.files.splice(i, 1)
+        },
+        onPicedRemove(pic) {
+            let fileName = pic.Path.substring(pic.Path.lastIndexOf('/'));
+            axios.delete(baseUrl + 'products/pictures' + fileName)
+                .then(res => {
+                    if (res.data.state == 1) {
+                        this.newProduct.Pictures.splice(this.newProduct.Pictures.indexOf(pic), 1)
+                    }
+                })
+        },
+        onStatus(file) {
             if (file.isSuccess) {
                 return "上传成功";
             } else if (file.isError) {
